@@ -74,13 +74,14 @@
                             <div class="icon"><i class="fas fa-cloud-upload-alt"></i>  &nbsp;</div>
                             <div class="drop-zone__prompt">Drop file here or click to upload</div>
                             </div>
-                            <input type="file" name="myFile" multiple class="drop-zone__input">
+                            {{ form }}
+                            <!-- <input type="file" name="filenames" class="drop-zone__input"> -->
                         </div>
                     </div>
                     <br>
                     <br>
                     <div class='d-flex justify-content-center'>
-                        <a href="/" class="btn btn-primary btn-round">upload</a>
+                        <button class="btn btn-primary btn-round">upload</button>
                     </div>
                 </form>
             </div>
@@ -175,6 +176,11 @@ $(document).ready(function() {
     }
 
 });
+
+{% if post %}
+demo.showNotification('top','right', '{{message}}' , 2)
+
+{% endif %}
 </script>
 
 {% endblock javascripts %}

@@ -13,7 +13,7 @@
 
         <ul class="nav">
           <li class="{% if 'search' in segment %} active {% endif %}">
-            <a href="/search.html">
+            <a href="{% url 'search' %}">
               <i class="tim-icons icon-zoom-split"></i>
               <p>Search</p>
             </a>
@@ -68,7 +68,7 @@
           </li>
           {% if request.user.is_authenticated %}
           <li class="{% if 'upload' in segment %} active {% endif %}">
-            <a  href="/upload.html">
+            <a  href="{% url 'upload' %}">
               <i class="tim-icons icon-cloud-upload-94"></i>
               <p>Upload</p>
             </a>
