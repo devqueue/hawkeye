@@ -4,7 +4,7 @@ from django.db import models
 
 class Csv(models.Model):
     id = models.AutoField(primary_key=True) 
-    file_name = models.FileField(upload_to='upload')
+    file_name = models.FileField(upload_to='media/upload/')
     uploaded = models.DateTimeField(auto_now_add=True)
     activated = models.BooleanField(default=False)
 
