@@ -20,13 +20,17 @@ def upload_file(request):
         obj = Csv.objects.get(activated=False)
         obj = Csv.objects.get(activated=False)
 
-        # populate the database
-        df = pd.read_excel(obj.file_name.path)
-        print(df)
+        # TODO: populate the database
+        try:
+            df = pd.read_excel(obj.file_name.path)
+            print(df)
+
+            # After sucessfully populating 
+            context['message'] = 'File was uploaded sucessfully.'
+            context['color'] = 2
+        except:
+            context['message'] = 'An Error occured while processing the file, please make sure the file format is correct and it contains all required columns.'
+            context['color'] = 4
         obj.activated = True
         obj.save()
-        context['message'] = 'File was uploaded sucessfully.'
-        return render(request, 'home/upload.html', context)
-
-    else:
-        return render(request, 'home/upload.html', context)
+    return render(request, 'home/upload.html', context)

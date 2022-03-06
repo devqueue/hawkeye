@@ -75,7 +75,6 @@
                             <div class="drop-zone__prompt">Drop file here or click to upload</div>
                             </div>
                             {{ form }}
-                            <!-- <input type="file" name="filenames" class="drop-zone__input"> -->
                         </div>
                     </div>
                     <br>
@@ -178,7 +177,7 @@ $(document).ready(function() {
 });
 
 {% if post %}
-demo.showNotification('top','right', '{{message}}' , 2)
+demo.showNotification('top','right', '{{message}}' , {{color}})
 
 {% endif %}
 </script>
