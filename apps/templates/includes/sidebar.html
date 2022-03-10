@@ -4,10 +4,10 @@
       <div class="sidebar-wrapper">
         <div class="logo">
           <a href="" class="simple-text logo-mini">
-            PI
+            GI
           </a>
           <a href="" class="simple-text logo-normal">
-            Django Black
+            Gene Search
           </a>
         </div>
 
@@ -18,7 +18,7 @@
               <p>Search</p>
             </a>
           </li>
-          <li class="{% if 'index' in segment %} active {% endif %}">
+          <!-- <li class="{% if 'index' in segment %} active {% endif %}">
             <a href="/">
               <i class="tim-icons icon-chart-pie-36"></i>
               <p>Dashboard</p>
@@ -65,7 +65,7 @@
               <i class="tim-icons icon-world"></i>
               <p>RTL Support</p>
             </a>
-          </li>
+          </li> -->
           {% if request.user.is_authenticated %}
           <li class="{% if 'upload' in segment %} active {% endif %}">
             <a  href="{% url 'upload' %}">
