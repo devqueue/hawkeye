@@ -7,6 +7,60 @@
 
 {% block content %}
 
+<div class="d-flex justify-content-center">
+<div class="col-md-12">
+<div class="card">
+<form role="form" method="post" action="">
+{% csrf_token %}
+<div class="card-body">
+<div class="d-flex justify-content-center">
+<div class="col-md-6 px-md-1">
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <select class="btn btn-outline-secondary dropdown-toggle"  type="button" name="type" id='type' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {% for type in types %}
+      <option value="{{type}}">{{type}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <input type="search" class="form-control" style="height:43px" placeholder="Search Gene" name="search">
+</div>
+</div>
+</div>
+</div>
+</form>
+<br>
+<br>
+  <div class="col-md-12">
+    <div class="card ">
+      <div class="card-header">
+        <h4 class="card-title"> Result</h4>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" style="overflow:auto;">
+          <table class="table tablesorter " id="">
+          <thead class=" text-primary">
+            <tr>
+              {% for i in df_header %}
+                <th>{{i}}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in df %}
+              <tr>
+                {% for j in i.values %}
+                  <td>{{j}}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 {% endblock content %}
 
@@ -16,8 +70,19 @@
   <script>
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
+      $('.input').keypress(function (e) {
+        if (e.which == 13) {
+          $('form').submit();
+          return false;    //<---- Add this line
+        }
+      });
 
+      $(function () {
+        let type = '{{sel_type}}';
+        $('#type').val(type);
+      });
+
+      $('thead').addClass('text-primary')
     });
   </script>
 
