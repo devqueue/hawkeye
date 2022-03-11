@@ -7,7 +7,7 @@
             GI
           </a>
           <a href="" class="simple-text logo-normal">
-            Gene Search
+            Search
           </a>
         </div>
 
@@ -66,13 +66,13 @@
               <p>RTL Support</p>
             </a>
           </li> -->
-          {% if request.user.is_authenticated %}
           <li class="{% if 'upload' in segment %} active {% endif %}">
             <a  href="{% url 'upload' %}">
               <i class="tim-icons icon-cloud-upload-94"></i>
               <p>Upload</p>
             </a>
           </li>
+          {% if request.user.is_authenticated %}
           <li>
             <a href="{% url 'logout' %}" >
               <i class="tim-icons icon-button-power"></i>
