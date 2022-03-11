@@ -45,7 +45,7 @@ def upload_file(request):
             df = count_het_hom(grouped)  # FIXME: slow and main bottleneck
             all_columns = list(df)  # Creates list of all column headers
             df[all_columns] = df[all_columns].astype(str)
-            dff = df[df.columns.difference(['count_hom', 'count_het'])].replace("'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True)
+            dff = df[df.columns.difference(['count_hom', 'count_het'])].replace("'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True).replace("\,", ";", regex=True)
             dff["count_hom"] = df['count_hom']
             dff["count_het"] = df['count_het']
             
@@ -61,6 +61,7 @@ def upload_file(request):
                 zygosity=record["zygosity"],
                 refGene_function=record.get("refGene function", None),
                 refGene_gene=record["refGene gene"],
+                quality=record.get('quality', None),
                 refGene_exonic_function=record.get("refGene exonic function", None),
                 AC=record.get("AC", None),
                 AC_hom=record.get("AC_hom", None),
