@@ -15,7 +15,7 @@ def search_gene(request):
         select_type = request.POST.get("type")
         context['sel_type'] = select_type
         if select_type == 'Gene':
-            result = GeneStorage.objects.filter(refGene_gene=search).values()
+            result = GeneStorage.objects.filter(refGene_gene__contains=search).values()
         else:
             result = GeneStorage.objects.filter(chromosome=search).values()
 
