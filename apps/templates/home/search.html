@@ -6,6 +6,15 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<!-- Page specific css and JS -->
+<style>
+  .mt-100 {
+    margin-top: 20px
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
+<script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
+<!-- Page specific css and JS -->
 
 <div class="d-flex justify-content-center">
 <div class="col-md-12">
@@ -13,6 +22,7 @@
 <form role="form" method="post" action="">
 {% csrf_token %}
 <div class="card-body">
+
 <div class="d-flex justify-content-center">
 <div class="col-md-6 px-md-1">
 <div class="input-group mb-3">
@@ -23,14 +33,30 @@
       {% endfor %}
     </select>
   </div>
-  <input type="search" class="form-control" style="height:43px" placeholder="Search Gene" name="search">
+  <input type="search" id='search' class="form-control" style="height:43px" placeholder="Search Gene" name="search">
 </div>
 </div>
 </div>
-<div class="d-flex flex-row-reverse bd-highlight">
-  <button type="button" class="btn btn-success" onclick="tableToCSV()">
-      Export
-  </button>
+<div class="d-flex justify-content-center mt-100">
+  <div class="d-flex flex-grow-1 bd-highlight">
+    <div class="p-2 flex-fill bd-highlight"> 
+      <select id="choices-multiple-remove-button" name='columns' placeholder="Select columns" multiple>
+          {% for column in df_header_all %}
+            <option value="{{column}}">{{column}}</option>
+          {% endfor %}
+      </select> 
+    </div>
+    <div class="p-2 flex-fill bd-highlight"> 
+      <button type="submit" class="btn btn-info" >
+      <i class="tim-icons icon-zoom-split"></i>
+      </button>
+    </div>
+    <div class="p-2 flex-fill bd-highlight">
+      <button type="button" class="btn btn-success" onclick="tableToCSV()">
+        Export
+      </button>
+    </div>
+  </div>
 </div>
 </div>
 </form>
@@ -75,19 +101,36 @@
   <script>
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
-      $('.input').keypress(function (e) {
+      $('#search').keypress(function (e) {
         if (e.which == 13) {
           $('form').submit();
-          return false;    //<---- Add this line
+          return false;    
         }
       });
 
       $(function () {
         let type = '{{sel_type}}';
         $('#type').val(type);
+                
+        let search_query = '{{search}}';
+        $('#search').val(search_query);
+
+        let options = [{{columns_req|safe}}] ;
+        $('#choices-multiple-remove-button').val(options[0]);
       });
 
+
+
       $('thead').addClass('text-primary')
+
+      var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+        removeItemButton: true,
+        maxItemCount:10,
+        searchResultLimit:15,
+        renderChoiceLimit:50
+      });
+
+
     });
 
 
