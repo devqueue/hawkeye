@@ -81,7 +81,8 @@ def upload_file(request):
             )for record in dff.to_dict('records')]
             try:
                 GeneStorage.objects.bulk_create(rows)
-            except:
+            except Exception as e:
+                print("[ERROR]:", e)
                 context['message'] = 'Could not populate the database, data already exists'
                 context["color"] = 4
                 return render(request, 'home/upload.html', context)
@@ -89,7 +90,8 @@ def upload_file(request):
             # After sucessfully populating 
             context['message'] = 'File was uploaded sucessfully.'
             context['color'] = 2
-        except:
+        except Exception as e:
+            print("[ERROR]:", e)
             context['message'] = 'An Error occured while processing the file, please make sure the file format is correct and it contains all required columns.'
             context['color'] = 4
         obj.activated = True
