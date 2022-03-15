@@ -78,7 +78,7 @@ def upload_file(request):
                 filename=record['filename'],
                 count_hom=record["count_hom"],
                 count_het=record["count_het"]
-            )for record in dff.to_dict('records')]
+            ) for record in dff.to_dict('records')]
             try:
                 GeneStorage.objects.bulk_create(rows)
             except Exception as e:

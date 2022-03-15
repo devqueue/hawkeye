@@ -10,10 +10,10 @@ urlpatterns = [
 
     # The home page
     # path('', views.index, name='home'),
-    # upload app
-    path('',  include('apps.upload.urls')),
     # search app
     path('',  include('apps.search.urls')),
+    # upload app
+    path('',  include('apps.upload.urls')),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 ] 
