@@ -44,10 +44,21 @@ def upload_file(request):
 
             df = count_het_hom(grouped)  # FIXME: slow and main bottleneck
             all_columns = list(df)  # Creates list of all column headers
+            df['count_het'].fillna(0, inplace=True)
+            df['count_hom'].fillna(0, inplace=True)
+            df['count_total'] = df['count_hom'] + df['count_het']
+
             df[all_columns] = df[all_columns].astype(str)
-            dff = df[df.columns.difference(['count_hom', 'count_het'])].replace("'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True).replace("\,", ";", regex=True)
+            dff = df[df.columns.difference(['count_hom', 'count_het', 'count_total'])].replace("'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True).replace("\,", ";", regex=True)
             dff["count_hom"] = df['count_hom']
             dff["count_het"] = df['count_het']
+            dff['count_total'] = df['count_total']
+
+            convert_dict = {'count_hom': float,
+                            'count_het': float,
+                            'count_total': float,
+                            }
+            dff = dff.astype(convert_dict)
             
             dff = dff.reset_index()
 
@@ -77,7 +88,8 @@ def upload_file(request):
                 CLNSIG=record.get("CLNSIG", None),
                 filename=record['filename'],
                 count_hom=record["count_hom"],
-                count_het=record["count_het"]
+                count_het=record["count_het"],
+                count_total=record['count_total']
             ) for record in dff.to_dict('records')]
             try:
                 GeneStorage.objects.bulk_create(rows)
