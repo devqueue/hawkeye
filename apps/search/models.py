@@ -28,5 +28,6 @@ class GeneStorage(models.Model):
     CADD_phred_41a = models.CharField(max_length=100, default=None, null=True, blank=True)
     CLNSIG = models.CharField(max_length=100, default=None, null=True, blank=True)
     filename = models.CharField(max_length=100, default=None, null=True, blank=True)
-    count_hom = models.CharField(max_length=100, default=None, null=True, blank=True)
-    count_het = models.CharField(max_length=100, default=None, null=True, blank=True)
+    count_hom = models.FloatField(max_length=100, default=None, null=True, blank=True)
+    count_het = models.FloatField(max_length=100, default=None, null=True, blank=True)
+    count_total = models.FloatField(max_length=100, default=None, null=True, blank=True)
