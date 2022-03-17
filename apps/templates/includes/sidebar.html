@@ -1,6 +1,6 @@
 
 
-    <div class="sidebar">
+    <div class="sidebar" data="green">
       <div class="sidebar-wrapper">
         <div class="logo">
           <a href="" class="simple-text logo-mini">
@@ -18,7 +18,13 @@
               <p>Search</p>
             </a>
           </li>
-          <!-- <li class="{% if 'index' in segment %} active {% endif %}">
+          <li class="{% if 'export' in segment %} active {% endif %}">
+            <a href="{% url 'export' %}">
+              <i class="tim-icons icon-cloud-download-93"></i>
+              <p>Export</p>
+            </a>
+          </li>
+          <li class="{% if 'index' in segment %} active {% endif %}">
             <a href="/">
               <i class="tim-icons icon-chart-pie-36"></i>
               <p>Dashboard</p>
@@ -65,7 +71,7 @@
               <i class="tim-icons icon-world"></i>
               <p>RTL Support</p>
             </a>
-          </li> -->
+          </li>
           {% if request.user.is_authenticated %}
           <li class="{% if 'upload' in segment %} active {% endif %}">
             <a  href="{% url 'upload' %}">
