@@ -14,17 +14,30 @@
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
 <script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
+<script>
+function validateForm() {
+    var start = $('#start').val();
+    var end = $('#end').val();
+    var type = $('#type').val();
+    console.log(start)
+    if (start == "" && end == '' && type == 'Chromosome') {
+        // alert("Start and end must be filled out");
+        demo.showNotification('top','right', 'Start and end must be filled out' , 3)
+        return false;
+    }
+}
+</script>
 <!-- Page specific css and JS -->
 
 <div class="d-flex justify-content-center">
 <div class="col-md-12">
 <div class="card">
-<form role="form" method="post" action="">
+<form role="form" method="post" action="" onsubmit="return validateForm()" >
 {% csrf_token %}
 <div class="card-body">
 
-<div class="d-flex justify-content-center">
-<div class="col-md-6 px-md-1">
+<div class="d-flex flex-grow-1 bd-highlight">
+<div class="p-2 flex-fill bd-highlight">
 <div class="input-group mb-3">
   <div class="input-group-prepend">
     <select class="btn btn-outline-secondary dropdown-toggle"  type="button" name="type" id='type' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -36,28 +49,41 @@
   <input type="search" id='search' class="form-control" style="height:43px" placeholder="Search Gene" name="search">
 </div>
 </div>
+<br>
 </div>
-<div class="d-flex justify-content-center mt-100">
-  <div class="d-flex flex-grow-1 bd-highlight">
-    <div class="p-2 flex-fill bd-highlight"> 
+
+<div id="positions"> 
+<div class="d-flex flex-grow-1 bd-highlight">
+<div class="p-2 flex-fill bd-highlight">
+  <label for="start">Start pos:</label>
+  <input type="number" id="start" name="start" class="form-control">
+</div>
+
+<div class="p-2 flex-fill bd-highlight">
+  <label for="end">End pos:</label>
+  <input type="number" id="end" name="end" class="form-control">
+</div>
+</div>
+</div>
+
+<div class="d-flex flex-grow-1 bd-highlight">
+  <div class="p-2 flex-fill bd-highlight ml-12"> 
       <select id="choices-multiple-remove-button" name='columns' placeholder="Select columns" multiple>
           {% for column in df_header_all %}
             <option value="{{column}}">{{column}}</option>
           {% endfor %}
       </select> 
     </div>
-    <div class="p-2 flex-fill bd-highlight"> 
+    <div class="p-1 bd-highlight"> 
       <button type="submit" class="btn btn-info" >
       <i class="tim-icons icon-zoom-split"></i>
       </button>
     </div>
-    <div class="p-2 flex-fill bd-highlight">
-      <button type="button" class="btn btn-success" onclick="tableToCSV()">
+  <div class="p-1 bd-highlight">
+      <button type="button" class="btn btn-info" onclick="tableToCSV()">
         Export
       </button>
-    </div>
   </div>
-</div>
 </div>
 </form>
 <br>
@@ -130,6 +156,29 @@
         renderChoiceLimit:50
       });
 
+      $('#type').change(function(){
+        var type = $('#type').val();
+        console.log(type)
+        if (type === 'Gene'){
+          $('#positions').hide();
+        } 
+        else{
+          $('#positions').show();
+        }
+      
+    });
+
+    $(function(){
+        var type = $('#type').val();
+        console.log(type)
+        if (type === 'Gene'){
+          $('#positions').hide();
+        } 
+        else{
+          $('#positions').show();
+        }
+      
+    });
 
     });
 
@@ -163,7 +212,12 @@
       csv_data = csv_data.join('\n');
 
       // Call this function to download csv file 
-      downloadCSVFile(csv_data);
+      if (rows.length > 1){
+        downloadCSVFile(csv_data);
+      }
+      else{
+        demo.showNotification('top','right', 'No table found. Retrieve a table first' , 3)
+      }
 
   }
 
@@ -193,6 +247,7 @@
       temp_link.click();
       document.body.removeChild(temp_link);
   }
+
   </script>
 
 {% endblock javascripts %}
