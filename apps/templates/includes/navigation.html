@@ -62,7 +62,10 @@
                 </ul>
               </li>
               <li class="separator d-lg-none"></li>
-
+            {% else %}
+            <a href="{% url 'login' %}">
+              <button type="submit" name="login" class="btn btn-fill btn-success">Login</button>
+            </a>
             {% endif %}  
             </ul>
 
