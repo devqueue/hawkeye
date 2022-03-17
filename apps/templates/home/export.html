@@ -1,0 +1,159 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Page Blank {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-center">
+<div class="col-md-12">
+<div class="card">
+<form role="form" method="post" action="" onsubmit="return validateForm()" >
+{% csrf_token %}
+<div class="card-body">
+
+<div class="d-flex flex-grow-1 bd-highlight">
+    <div class="p-2 flex-fill bd-highlight ml-12"> 
+        <input type="search" id='search' class="form-control" style="height:43px" placeholder="Search filename" name="search">
+    </div>
+    <div class="p-1 bd-highlight"> 
+      <button type="submit" class="btn btn-info" >
+      <i class="tim-icons icon-zoom-split"></i>
+      </button>
+    </div>
+    <div class="p-1 bd-highlight">
+      <button type="button" class="btn btn-info" onclick="tableToCSV()">
+        Export
+      </button>
+    </div>
+</div>
+</form>
+<br>
+<br>
+<div class="col-md-12">
+<div class="card ">
+    <div class="card-header">
+    <h4 class="card-title">Result</h4>
+    </div>
+    <div class="card-body">
+    <div class="table-responsive" style="overflow:auto;">
+        <table class="table tablesorter " id="">
+        <thead class=" text-primary">
+        <tr>
+            {% for i in df_header %}
+            <th>{{i}}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in df %}
+            <tr>
+            {% for j in i.values %}
+                <td>{{j}}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+</div>
+    
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+ <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      $('#search').keypress(function (e) {
+        if (e.which == 13) {
+          $('form').submit();
+          return false;    
+        }
+      });
+
+      $(function () {
+        let filename = '{{filename}}';
+        $('#search').val(type);
+                
+      });
+
+      $('thead').addClass('text-primary')
+
+      
+    });
+
+
+  function tableToCSV() {
+
+      // Variable to store the final csv data
+      var csv_data = [];
+
+      // Get each row data
+      var rows = document.getElementsByTagName('tr');
+      for (var i = 0; i < rows.length; i++) {
+
+          // Get each column data
+          var cols = rows[i].querySelectorAll('td,th');
+
+          // Stores each csv row data
+          var csvrow = [];
+          for (var j = 0; j < cols.length; j++) {
+
+              // Get the text data of each cell
+              // of a row and push it to csvrow
+              csvrow.push(cols[j].innerHTML);
+          }
+
+          // Combine each column value with comma
+          csv_data.push(csvrow.join(","));
+      }
+
+      // Combine each row data with new line character
+      csv_data = csv_data.join('\n');
+
+      // Call this function to download csv file 
+      if (rows.length > 1){
+        downloadCSVFile(csv_data);
+      }
+      else{
+        demo.showNotification('top','right', 'No table found. Retrieve a table first' , 3)
+      }
+
+  }
+
+  function downloadCSVFile(csv_data) {
+
+      // Create CSV file object and feed
+      // our csv_data into it
+      CSVFile = new Blob([csv_data], {
+          type: "text/csv"
+      });
+
+      // Create to temporary link to initiate
+      // download process
+      var temp_link = document.createElement('a');
+
+      // Download csv file
+      temp_link.download = "exported.csv";
+      var url = window.URL.createObjectURL(CSVFile);
+      temp_link.href = url;
+
+      // This link should not be displayed
+      temp_link.style.display = "none";
+      document.body.appendChild(temp_link);
+
+      // Automatically click the link to
+      // trigger download
+      temp_link.click();
+      document.body.removeChild(temp_link);
+  }
+
+  </script>
+
+{% block javascripts %}{% endblock javascripts %}
