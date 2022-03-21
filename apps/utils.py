@@ -14,19 +14,17 @@ def unauthenticated_user(view_func):
 
 
 def allowed_users(allowed_roles=[]):
-	def decorator(view_func):
-		def wrapper_func(request, *args, **kwargs):
+    def decorator(view_func):
+        def wrapper_func(request, *args, **kwargs):
 
-			group = None
-			if request.user.groups.exists():
-				group = request.user.groups.all()[0].name
-
-			if (group in allowed_roles) or request.user.is_superuser:
-				return view_func(request, *args, **kwargs)
-			else:
-				return render(request, 'home/page-403.html', )
-		return wrapper_func
-	return decorator
+            group = request.user.groups.all()
+            
+            if (any(item == str(gr) for gr in group for item in allowed_roles)) or request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
+            else:
+                return render(request, 'home/page-403.html', )
+        return wrapper_func
+    return decorator
 
 
 
