@@ -1,11 +1,12 @@
-from email.policy import default
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .models import GeneStorage
 import pandas as pd
+from django.http import HttpResponse
 # Create your views here.
 
 
-# @login_required(login_url='accounts/login_user')
+@login_required(login_url='accounts/login_user')
 def search_gene(request):
     context = {
         'segment': 'search',
@@ -31,6 +32,8 @@ def search_gene(request):
             convert_dict = {'count_hom': int,
                             'count_het': int,
                             'count_total': int,
+                            'files_uploaded': int,
+                            'New_allele_frequency': int,
                             }
 
             df = df.astype(convert_dict)
@@ -42,8 +45,7 @@ def search_gene(request):
             if columns_required != []:
                 df.drop(df.columns.difference(columns_required), axis=1, inplace=True)
             else:
-                df.drop(df.columns.difference(['chromosome', 'start_pos', 'end_pos', 'reference', 'observed',
-                                            'refGene gene', 'zygosity', 'filename', 'count_hom', 'count_het', 'count_total']), axis=1, inplace=True)
+                df.drop(df.columns.difference(['chromosome', 'start_pos', 'end_pos', 'reference', 'observed', 'refGene gene', 'zygosity', 'filename', 'count_hom', 'count_het', 'count_total']), axis=1, inplace=True)
                 
             context['df'] = df.to_dict('records')
             context['df_header'] = list(df.columns)
@@ -57,6 +59,7 @@ def search_gene(request):
         return render(request, 'home/search.html', context)
 
 
+@login_required(login_url='login/')
 def export(request):
     context = {
         'segment': 'export',
@@ -64,10 +67,26 @@ def export(request):
     if request.method == 'POST':
         filename = request.POST.get('search')
         context['filename'] = filename
-        
-        result = GeneStorage.objects.filter(filename=filename).values()
+        result = GeneStorage.objects.filter(filename__contains=filename).values()
         df = pd.DataFrame(list(result))
         context['df_header'] = list(df.columns)
         context['df'] = df.to_dict('records')
+        
+        if df.empty:
+            context['notfound'] = True
+            print("not found")
+            return render(request, 'home/export.html', context)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename={filename}.csv'
+        print("FOUND")
+        df.to_csv(path_or_buf=response)
+        return response
 
     return render(request, 'home/export.html', context)
+
+
+def compute(request):
+    context = {
+        'segment': 'export',
+    }
