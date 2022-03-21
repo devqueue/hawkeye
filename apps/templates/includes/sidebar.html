@@ -10,7 +10,7 @@
             Search
           </a>
         </div>
-
+        {% if request.user.is_authenticated %}
         <ul class="nav">
           <li class="{% if 'search' in segment %} active {% endif %}">
             <a href="{% url 'search' %}">
@@ -24,7 +24,13 @@
               <p>Export</p>
             </a>
           </li>
-          <li class="{% if 'index' in segment %} active {% endif %}">
+          <li class="{% if 'compute' in segment %} active {% endif %}">
+            <a href="{% url 'compute' %}">
+              <i class="tim-icons icon-refresh-02"></i>
+              <p>Compute</p>
+            </a>
+          </li>
+          <!-- <li class="{% if 'index' in segment %} active {% endif %}">
             <a href="/">
               <i class="tim-icons icon-chart-pie-36"></i>
               <p>Dashboard</p>
@@ -71,8 +77,8 @@
               <i class="tim-icons icon-world"></i>
               <p>RTL Support</p>
             </a>
-          </li>
-          {% if request.user.is_authenticated %}
+          </li> -->
+          
           <li class="{% if 'upload' in segment %} active {% endif %}">
             <a  href="{% url 'upload' %}">
               <i class="tim-icons icon-cloud-upload-94"></i>
