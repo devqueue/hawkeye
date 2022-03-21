@@ -6,8 +6,8 @@ from django.db import models
 class GeneStorage(models.Model):
     id = models.AutoField(primary_key=True)
     chromosome = models.CharField(max_length=100)
-    start_pos = models.CharField(max_length=100)
-    end_pos = models.CharField(max_length=100)
+    start_pos = models.IntegerField()
+    end_pos = models.IntegerField()
     reference = models.CharField(max_length=100)
     observed = models.CharField(max_length=100, default=None, null=True, blank=True)
     zygosity = models.CharField(max_length=100, default=None)
@@ -31,3 +31,5 @@ class GeneStorage(models.Model):
     count_hom = models.FloatField(max_length=100, default=None, null=True, blank=True)
     count_het = models.FloatField(max_length=100, default=None, null=True, blank=True)
     count_total = models.FloatField(max_length=100, default=None, null=True, blank=True)
+    files_uploaded = models.FloatField(max_length=100, default=None, null=True, blank=True)
+    New_allele_frequency = models.FloatField(max_length=100, default=None, null=True, blank=True)
