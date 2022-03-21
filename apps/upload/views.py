@@ -140,20 +140,20 @@ def compute(request):
         'segment': 'compute',
     }
 
-    result = GeneStorage.objects.all().values()[:8]
+    result = GeneStorage.objects.all().values()
     df = pd.DataFrame(result)
     try:
-        df = df[['chromosome', 'start_pos', 'end_pos', 'reference', 'observed', 'refGene_gene', 'zygosity',
-                'filename', 'count_hom', 'count_het', 'count_total', 'files_uploaded', 'New_allele_frequency']]
+        df = df[['chromosome', 'start_pos', 'end_pos', 'observed', 'refGene_gene', 'zygosity',
+                'filename', 'count_hom', 'count_het', 'files_uploaded', 'New_allele_frequency']]
 
         convert_dict = {'count_hom': int,
                     'count_het': int,
-                    'count_total': int,
                     'files_uploaded': int,
                     'New_allele_frequency': int,
                     }
 
         df = df.astype(convert_dict)
+        df = df.sample(8)
         context['df_header'] = list(df.columns)
         context['df'] = df.to_dict('records')
     except Exception:
