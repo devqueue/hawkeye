@@ -3,8 +3,11 @@ from django.contrib.auth.decorators import login_required
 from .forms import CsvModelForm
 from .models import Csv
 import pandas as pd
+import numpy as np
 from apps.utils import count_het_hom, required
 from apps.search.models import GeneStorage
+from datetime import datetime
+import traceback
 # Create your views here.
 
 
@@ -17,63 +20,81 @@ def upload_file(request):
         'segment': 'upload',
         'form': form
     }
+    start = datetime.now()
     if form.is_valid():
         context['post'] = True
         form.save()
         form = CsvModelForm()
-        obj = Csv.objects.get(activated=False)
         obj = Csv.objects.get(activated=False)
 
         if (obj.file_name.path).endswith('.csv'):
             is_csv = True
         if (obj.file_name.path).endswith('.xlsx') or (obj.file_name.path).endswith('.xls'):
             is_excel = True
+        
         # populate the database
+        
         try:
             if is_csv:
-                df = pd.read_csv(obj.file_name.path, low_memory=False)
+                df1 = pd.read_csv(obj.file_name.path, low_memory=False)
             elif is_excel:
-                df = pd.read_excel(obj.file_name.path, low_memory=False)
+                df1 = pd.read_excel(obj.file_name.path, low_memory=False)
 
             name = obj.file_name.path.split('/')[-1]
-            df.dropna(how='all', axis=1, inplace=True)
-            df.drop(df.columns.difference(required), axis=1, inplace=True)
-            df['filename'] = [name] * len(df)
-            grouped = df.groupby(['chromosome', 'start pos', 'end pos',
-                                    'reference']).agg(lambda x: x.tolist())
+            df1.dropna(how='all', axis=1, inplace=True)
+            df1.drop(df1.columns.difference(required), axis=1, inplace=True)
+            df1.columns = df1.columns.str.replace(' ', '_')
+            df1['filename'] = [name] * len(df1)
+
+
+            # TODO: get all objects from the database
+            gene_already = GeneStorage.objects.all().values()
+            df_old = pd.DataFrame(gene_already)
+            print(df_old)
+            print(df1)
+            df = pd.concat([df_old, df1])
+
+            grouped = df.groupby(['chromosome', 'start_pos', 'end_pos',
+                                  'observed']).agg(lambda x: x.tolist())
 
             df = count_het_hom(grouped)  # FIXME: slow and main bottleneck
             all_columns = list(df)  # Creates list of all column headers
-            df['count_het'].fillna(0, inplace=True)
-            df['count_hom'].fillna(0, inplace=True)
-            df['count_total'] = df['count_hom'] + df['count_het']
 
             df[all_columns] = df[all_columns].astype(str)
-            dff = df[df.columns.difference(['count_hom', 'count_het', 'count_total'])].replace("'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True).replace("\,", ";", regex=True)
-            dff["count_hom"] = df['count_hom']
-            dff["count_het"] = df['count_het']
-            dff['count_total'] = df['count_total']
-
+            dff = df.replace("'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True).replace("\,", ";", regex=True)
+            print("After replace")
+            print(dff)
             convert_dict = {'count_hom': float,
                             'count_het': float,
-                            'count_total': float,
                             }
             dff = dff.astype(convert_dict)
-            
+
+            dff['count_het'].fillna(0, inplace=True)
+            dff['count_hom'].fillna(0, inplace=True)
+            dff['count_total'] = dff['count_hom'] + dff['count_het']
+
+
+            dff['files_uploaded'] = [len(dff['filename'].unique())] * len(dff)
+            dff['New_allele_frequency'] = (dff['count_het'] + 2*dff['count_hom']) / (dff['files_uploaded'] * 2)
+
+
             dff = dff.reset_index()
+            print(dff)
+            print(dff.info())
+            # TODO: check if file name exists in database:
 
             rows = [GeneStorage(
                 # id=record[" "],
                 chromosome=record["chromosome"],
-                start_pos=record["start pos"],
-                end_pos=record["end pos"],
+                start_pos=record["start_pos"],
+                end_pos=record["end_pos"],
                 reference=record["reference"],
                 observed=record["observed"],
                 zygosity=record["zygosity"],
-                refGene_function=record.get("refGene function", None),
-                refGene_gene=record["refGene gene"],
+                refGene_function=record.get("refGene_function", None),
+                refGene_gene=record["refGene_gene"],
                 quality=record.get('quality', None),
-                refGene_exonic_function=record.get("refGene exonic function", None),
+                refGene_exonic_function=record.get("refGene_exonic_function", None),
                 AC=record.get("AC", None),
                 AC_hom=record.get("AC_hom", None),
                 aug_all=record.get("1000g2015aug_all", None),
@@ -89,23 +110,52 @@ def upload_file(request):
                 filename=record['filename'],
                 count_hom=record["count_hom"],
                 count_het=record["count_het"],
-                count_total=record['count_total']
+                count_total=record['count_total'],
+                files_uploaded=record['files_uploaded'],
+                New_allele_frequency=record['New_allele_frequency']
             ) for record in dff.to_dict('records')]
-            try:
-                GeneStorage.objects.bulk_create(rows)
-            except Exception as e:
-                print("[ERROR]:", e)
-                context['message'] = 'Could not populate the database, data already exists'
-                context["color"] = 4
-                return render(request, 'home/upload.html', context)
 
+            GeneStorage.objects.all().delete()
+            GeneStorage.objects.bulk_create(rows)
+            
             # After sucessfully populating 
             context['message'] = 'File was uploaded sucessfully.'
             context['color'] = 2
-        except Exception as e:
-            print("[ERROR]:", e)
+        except Exception:
+            traceback.print_exc()
             context['message'] = 'An Error occured while processing the file, please make sure the file format is correct and it contains all required columns.'
             context['color'] = 4
         obj.activated = True
         obj.save()
+    end = datetime.now()
+    print(end - start)
     return render(request, 'home/upload.html', context)
+
+
+@login_required(login_url='/login')
+def compute(request):
+    context = {
+        'segment': 'compute',
+    }
+
+    result = GeneStorage.objects.all().values()[:8]
+    df = pd.DataFrame(result)
+    try:
+        df = df[['chromosome', 'start_pos', 'end_pos', 'reference', 'observed', 'refGene_gene', 'zygosity',
+                'filename', 'count_hom', 'count_het', 'count_total', 'files_uploaded', 'New_allele_frequency']]
+
+        convert_dict = {'count_hom': int,
+                    'count_het': int,
+                    'count_total': int,
+                    'files_uploaded': int,
+                    'New_allele_frequency': int,
+                    }
+
+        df = df.astype(convert_dict)
+        context['df_header'] = list(df.columns)
+        context['df'] = df.to_dict('records')
+    except Exception:
+        traceback.print_exc()
+    
+
+    return render(request, 'home/compute.html', context)
