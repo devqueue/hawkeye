@@ -3,10 +3,12 @@ from django.contrib.auth.decorators import login_required
 from .models import GeneStorage
 import pandas as pd
 from django.http import HttpResponse
+from apps.utils import allowed_users
 # Create your views here.
 
 
 @login_required(login_url='accounts/login_user')
+@allowed_users(allowed_roles=['compute', 'search'])
 def search_gene(request):
     context = {
         'segment': 'search',
@@ -60,6 +62,7 @@ def search_gene(request):
 
 
 @login_required(login_url='login/')
+@allowed_users(allowed_roles=['compute', 'search'])
 def export(request):
     context = {
         'segment': 'export',

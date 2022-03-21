@@ -4,7 +4,7 @@ from .forms import CsvModelForm
 from .models import Csv
 import pandas as pd
 import numpy as np
-from apps.utils import count_het_hom, required
+from apps.utils import count_het_hom, required, allowed_users
 from apps.search.models import GeneStorage
 from datetime import datetime
 import traceback
@@ -12,6 +12,7 @@ import traceback
 
 
 @login_required(login_url='/login')
+@allowed_users(allowed_roles=['compute'])
 def upload_file(request):
     form = CsvModelForm(request.POST or None, request.FILES or None)
     is_csv = False
@@ -133,6 +134,7 @@ def upload_file(request):
 
 
 @login_required(login_url='/login')
+@allowed_users(allowed_roles=['compute'])
 def compute(request):
     context = {
         'segment': 'compute',
