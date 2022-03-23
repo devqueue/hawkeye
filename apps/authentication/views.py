@@ -10,9 +10,6 @@ from .forms import LoginForm, SignUpForm
 from django.contrib.auth.models import Group
 from apps.utils import unauthenticated_user
 
-# create groups
-compute, created = Group.objects.get_or_create(name='compute')
-search, created = Group.objects.get_or_create(name='search')
 
 @unauthenticated_user
 def login_view(request):
@@ -41,6 +38,10 @@ def login_view(request):
 def register_user(request):
     msg = None
     success = False
+    # create groups
+    compute, created = Group.objects.get_or_create(name='compute')
+    search, created = Group.objects.get_or_create(name='search')
+
 
     if request.method == "POST":
         form = SignUpForm(request.POST)
@@ -53,7 +54,7 @@ def register_user(request):
             user.groups.add(group)
             user = authenticate(username=username, password=raw_password)
 
-            msg = ''
+            msg = 'User account was created sucessfully'
             success = True
 
             # return redirect("login/")
