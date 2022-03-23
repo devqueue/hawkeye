@@ -1,5 +1,3 @@
-import numpy as np
-from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 
@@ -28,24 +26,6 @@ def allowed_users(allowed_roles=[]):
 
 
 
-def count_het_hom(grouped):
-    for index in grouped.index:
-        if len(grouped.loc[index]['zygosity']) == 1:
-            if grouped.loc[index]['zygosity'][0] == 'het':
-                grouped.at[index, 'count_het'] = 1
-            if grouped.loc[index]['zygosity'][0] == 'hom':
-                grouped.at[index, 'count_hom'] = 1
-        else:
-            length = len(grouped.loc[index]['zygosity'])
-            for i in range(length):
-                if grouped.loc[index]['zygosity'][i] == 'hom':
-                    grouped.at[index, 'count_hom'] = int(np.nan_to_num(
-                        grouped.at[index, 'count_hom']) + 1)
-                elif grouped.loc[index]['zygosity'][i] == 'het':
-                    grouped.at[index, 'count_het'] = int(np.nan_to_num(
-                        grouped.at[index, 'count_het']) + 1)
-    return grouped
-
 
 required = ["chromosome",
             "start pos",
@@ -68,6 +48,4 @@ required = ["chromosome",
             "Polyphen2_HDIV_pred_41a",
             "Polyphen2_HVAR_pred_41a",
             "CADD_phred_41a",
-            "CLNSIG",
-            "count hom",
-            "count het"]
+            "CLNSIG"]
