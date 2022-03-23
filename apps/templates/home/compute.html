@@ -54,6 +54,10 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script>
+{% if post %}
+demo.showNotification('top','right', '{{message}}' , {{color}})
 
-
+{% endif %}
+</script>
 {% endblock javascripts %}
