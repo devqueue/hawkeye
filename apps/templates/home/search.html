@@ -141,6 +141,12 @@ function validateForm() {
         let search_query = '{{search}}';
         $('#search').val(search_query);
 
+        let start = '{{start}}';
+        $('#start').val(start);
+
+        let end = '{{end}}';
+        $('#end').val(end);
+
         let options = [{{columns_req|safe}}] ;
         $('#choices-multiple-remove-button').val(options[0]);
       });
