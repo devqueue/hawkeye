@@ -20,6 +20,7 @@ def search_gene(request):
             select_type = request.POST.get("type")
             start = request.POST.get('start', default=None)
             end = request.POST.get('end', default=None)
+            export = request.POST.get('export')
             columns_required = request.POST.getlist('columns')
             context['sel_type'] = select_type
             context['search'] = search
@@ -28,7 +29,10 @@ def search_gene(request):
             context['end'] = end
 
             if select_type == 'Gene':
-                result = GeneStorage.objects.filter(refGene_gene__contains=search).values()
+                if (search.startswith('"') and search.endswith('"')):
+                    result = GeneStorage.objects.filter(refGene_gene=search).values()
+                else:
+                    result = GeneStorage.objects.filter(refGene_gene__contains=search).values()
             else:
                 result = GeneStorage.objects.filter(chromosome=search, start_pos=start, end_pos=end).values()
 
@@ -46,6 +50,16 @@ def search_gene(request):
                 
             context['df'] = df.to_dict('records')
             context['df_header'] = list(df.columns)
+
+            if export:
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = f'attachment; filename=exported.csv'
+                export = pd.DataFrame(list(result))
+                export = export.rename({'aug_all': '1000genome'}, axis=1)
+                export.dropna(how='all', axis=1, inplace=True)
+                export.to_csv(path_or_buf=response)
+                return response
+
             return render(request, 'home/search.html', context)
         except Exception as e:
             print('[ERROR]:', e)
