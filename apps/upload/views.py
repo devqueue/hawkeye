@@ -94,8 +94,8 @@ def compute(request):
                 "'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True).replace("\,", ";", regex=True)
 
 
-            grouped['count_het'] = grouped['zygosity'].apply(lambda x: x.count('hom'))
-            grouped['count_hom'] = grouped['zygosity'].apply(lambda x: x.count('het'))
+            grouped['count_hom'] = grouped['zygosity'].apply(lambda x: x.count('hom'))
+            grouped['count_het'] = grouped['zygosity'].apply(lambda x: x.count('het'))
 
             grouped['count_total'] = grouped['count_het'] + grouped['count_hom']
             grouped['files_uploaded'] = [len(df_list)] * len(grouped)
