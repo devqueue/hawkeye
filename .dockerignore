@@ -1,15 +1,19 @@
 # Git
 .git
 .gitignore
+README.md
+CHANGELOG.md
+LICENSE.md
 
 # Docker
 .docker
 
 # Python
-app/__pycache__/
-app/*/__pycache__/
-app/*/*/__pycache__/
-app/*/*/*/__pycache__/
+core/__pycache__/
+apps/__pycache__/
+apps/*/__pycache__/
+apps/*/*/__pycache__/
+apps/*/*/*/__pycache__/
 .env/
 .venv/
 venv/
