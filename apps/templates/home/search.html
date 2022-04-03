@@ -80,9 +80,9 @@ function validateForm() {
       </button>
     </div>
   <div class="p-1 bd-highlight">
-      <button type="button" class="btn btn-info" onclick="tableToCSV()">
-        Export
-      </button>
+      <input type="submit" value="Export" class="btn btn-info" name="export">
+        
+      </input>
   </div>
 </div>
 </form>
@@ -138,7 +138,7 @@ function validateForm() {
         let type = '{{sel_type}}';
         $('#type').val(type);
                 
-        let search_query = '{{search}}';
+        let search_query = '{{search | safe}}';
         $('#search').val(search_query);
 
         let start = '{{start}}';
@@ -157,7 +157,7 @@ function validateForm() {
 
       var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
         removeItemButton: true,
-        maxItemCount:10,
+        maxItemCount:30,
         searchResultLimit:15,
         renderChoiceLimit:50
       });

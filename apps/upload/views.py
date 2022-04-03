@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.settings import UPLOAD_PATH
 from .forms import CsvModelForm
-from .models import Csv
 import pandas as pd
 from apps.utils import required, allowed_users
 from apps.search.models import GeneStorage
@@ -25,40 +24,47 @@ def upload_file(request):
 
     if form.is_valid():
         context['post'] = True
-        form.save()
-        form = CsvModelForm()
-        obj = Csv.objects.get(activated=False)
+        file_name = form.cleaned_data.get('file_name')
+        file_path = form.cleaned_data.get('file_name').temporary_file_path()
 
-        if (obj.file_name.path).endswith('.csv'):
+        if (str(file_name)).endswith('.csv'):
             is_csv = True
-        if (obj.file_name.path).endswith('.xlsx') or (obj.file_name.path).endswith('.xls'):
+        if (str(file_name)).endswith('.xlsx') or (str(file_name)).endswith('.xls'):
             is_excel = True
         
         try:
             if is_csv:
-                headers = pd.read_csv(obj.file_name.path, nrows=0).columns.tolist()
+                headers = pd.read_csv(file_path, nrows=0).columns.tolist()
                 req = set(headers) & set(required)
-                df1 = pd.read_csv(obj.file_name.path, usecols=req, low_memory=False)
+                df1 = pd.read_csv(file_path, usecols=req, low_memory=False)
             elif is_excel:
-                headers = pd.read_excel(obj.file_name.path,
+                headers = pd.read_excel(file_path,
                                       nrows=0).columns.tolist()
                 req = set(headers) & set(required)               
-                df1 = pd.read_excel(obj.file_name.path, usecols=req, low_memory=False)
+                df1 = pd.read_excel(file_path, usecols=req, low_memory=False)
 
             df1.columns = df1.columns.str.replace(' ', '_')
             test = df1[['chromosome', 'start_pos', 'end_pos', 'observed', 'refGene_gene', 'zygosity']]
 
-            # After sucessfully uploading 
-            context['message'] = 'File was uploaded sucessfully.'
-            context['color'] = 2
+            # check of the same file exists in the file system.
+            file_list = [i for i in os.listdir(UPLOAD_PATH) if i.endswith('.csv')]
+
+            if str(file_name) in file_list:
+                context['message'] = 'File already exists. Please upload a new file'
+                context['color'] = 3
+                return render(request, 'home/upload.html', context)
+            else:
+                # After sucessfully uploading
+                context['message'] = 'File was uploaded sucessfully.'
+                context['color'] = 2
+                form.cleaned_data['activated'] = True
+                form.save()
+
         except Exception:
             traceback.print_exc()
             context['message'] = 'An Error occured while uploading the file, please make sure the file format is correct and it contains all required columns.'
             context['color'] = 4
-        obj.activated = True
-        obj.save()
 
-    
     return render(request, 'home/upload.html', context)
 
 
@@ -94,8 +100,8 @@ def compute(request):
                 "'", "", regex=True).replace("\[", "", regex=True).replace("\]", "", regex=True).replace("\,", ";", regex=True)
 
 
-            grouped['count_het'] = grouped['zygosity'].apply(lambda x: x.count('hom'))
-            grouped['count_hom'] = grouped['zygosity'].apply(lambda x: x.count('het'))
+            grouped['count_hom'] = grouped['zygosity'].apply(lambda x: x.count('hom'))
+            grouped['count_het'] = grouped['zygosity'].apply(lambda x: x.count('het'))
 
             grouped['count_total'] = grouped['count_het'] + grouped['count_hom']
             grouped['files_uploaded'] = [len(df_list)] * len(grouped)

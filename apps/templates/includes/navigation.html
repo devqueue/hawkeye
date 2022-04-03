@@ -1,5 +1,6 @@
 
       <!-- Navbar -->
+      {% load static %}
       <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
         <div class="container-fluid">
           <div class="navbar-wrapper">
@@ -48,7 +49,7 @@
               <li class="dropdown nav-item">
                 <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                   <div class="photo">
-                    <img src="/static/assets/img/anime3.png" alt="Profile Photo">
+                    <img src="{% static 'assets/img/anime3.png' %}" alt="Profile Photo">
                   </div>
                   <b class="caret d-none d-lg-block d-xl-block"></b>
                   <p class="d-lg-none">
