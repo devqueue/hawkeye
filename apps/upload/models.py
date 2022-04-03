@@ -1,5 +1,4 @@
 from django.db import models
-from core.settings import UPLOAD_PATH
 # Create your models here.
 
 class Csv(models.Model):
