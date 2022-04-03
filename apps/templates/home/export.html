@@ -20,14 +20,44 @@
         <input type="search" id='search' class="form-control" style="height:43px" placeholder="Search filename" name="search">
     </div>
     <div class="p-1 bd-highlight">
-      <button type="submit" class="btn btn-info">
-        Export
+      <button type="submit" class="btn btn-info" >
+      <i class="tim-icons icon-zoom-split"></i>
       </button>
+      <input type="submit" value="Export" class="btn btn-info" name="export">
     </div>
 </div>
 </form>
 <br>
 <br>
+  <div class="col-md-12">
+    <div class="card ">
+      <div class="card-header">
+        <h4 class="card-title"> Result</h4>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" style="overflow:auto;">
+          <table class="table tablesorter " id="">
+          <thead class=" text-primary">
+            <tr>
+              {% for i in df_header %}
+                <th>{{i}}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in df %}
+              <tr>
+                {% for j in i.values %}
+                  <td>{{j}}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
 {% endblock content %}
 
@@ -47,7 +77,7 @@
       });
 
       $(function () {
-        let filename = '{{filename}}';
+        let filename = '{{filename | safe}}';
         $('#search').val(filename);
                 
       });

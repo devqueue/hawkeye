@@ -30,6 +30,7 @@ def search_gene(request):
 
             if select_type == 'Gene':
                 if (search.startswith('"') and search.endswith('"')):
+                    search = search.replace('"', '')
                     result = GeneStorage.objects.filter(refGene_gene=search).values()
                 else:
                     result = GeneStorage.objects.filter(refGene_gene__contains=search).values()
@@ -78,9 +79,17 @@ def export(request):
     }
     if request.method == 'POST':
         filename = request.POST.get('search')
+        export = request.POST.get('export')
         context['filename'] = filename
-        result = GeneStorage.objects.filter(filename__contains=filename).values()
+
+        if (filename.startswith('"') and filename.endswith('"')):
+            filename = filename.replace('"', '')
+            result = GeneStorage.objects.filter(filename=filename).values()
+        else:
+            result = GeneStorage.objects.filter(filename__contains=filename).values()
+            
         df = pd.DataFrame(list(result))
+        df = df.head(50)
         context['df_header'] = list(df.columns)
         context['df'] = df.to_dict('records')
         
@@ -88,12 +97,12 @@ def export(request):
             context['notfound'] = True
             print("[INFO]: FILE NOT FOUND")
             return render(request, 'home/export.html', context)
-
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename={filename}.csv'
-        print("[INFO]: FILE FOUND")
-        df.to_csv(path_or_buf=response)
-        return response
+        if export:
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename={filename}.csv'
+            print("[INFO]: FILE FOUND")
+            df.to_csv(path_or_buf=response)
+            return response
 
     return render(request, 'home/export.html', context)
 
