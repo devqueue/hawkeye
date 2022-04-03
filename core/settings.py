@@ -137,6 +137,6 @@ STATICFILES_DIRS = (
 
 
 # UPLOAD FILES
-UPLOAD_PATH = os.path.join(MEDIA_ROOT, 'upload')
+UPLOAD_PATH = MEDIA_ROOT
 #############################################################
 #############################################################
