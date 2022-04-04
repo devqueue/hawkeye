@@ -1,6 +1,17 @@
 # Change Log
 
-## [0.0.2] 2022-02-29
+## [0.0.3] 2022-04-03
+### Improvements
+- Search for file names (50 records)
+- Only unique file uploads allowed
+- Handling static files 
+- Fully tested docker dev build
+- Fixes:
+  - Postgres error
+  - Exact search returns empty
+  - Notifications display error
+  - Name error for js and css files
+## [0.0.2] 2022-03-29
 ### Improvements 
 
 - Search for exact gene using quotes
