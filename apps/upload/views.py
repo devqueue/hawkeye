@@ -47,6 +47,7 @@ def upload_file(request):
             test = df1[['chromosome', 'start_pos', 'end_pos', 'observed', 'refGene_gene', 'zygosity']]
 
             # check of the same file exists in the file system.
+            os.makedirs(UPLOAD_PATH, exist_ok=True)
             file_list = [i for i in os.listdir(UPLOAD_PATH) if i.endswith('.csv')]
 
             if str(file_name) in file_list:
