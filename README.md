@@ -3,6 +3,9 @@ A web application for gene search built with django using the [django black temp
 
 <br />
 
+## Data requirements
+1. The uploaded CSV files must contain the following columns Chromosome, start, end, observed, gene, zygosity, filename
+2. Rest of the columns are optional
 ## ✨ Deploy in production using `Docker`
 
 > Get the code
