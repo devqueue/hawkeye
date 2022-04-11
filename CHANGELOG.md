@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.0.4] 2022-04-11
+### Improvements
+- Configs for Nginx 
+- Seperate config for development and deployment
+- Uniform way of handling environment variables
 ## [0.0.3] 2022-04-03
 ### Improvements
 - Search for file names (50 records)
