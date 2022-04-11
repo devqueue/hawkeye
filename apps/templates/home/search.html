@@ -12,8 +12,9 @@
     margin-top: 20px
 }
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
-<script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
+{% load static %}
+<link rel="stylesheet" href="{% static 'assets/css/choices.min.css' %}">
+<script src="{% static 'assets/js/choices.min.js' %}"></script>
 <script>
 function validateForm() {
     var start = $('#start').val();
