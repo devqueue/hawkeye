@@ -1,9 +1,9 @@
 # Gene lookup
-A web application for gene search
+A web application for gene search built with django using the [django black template](https://github.com/creativetimofficial/black-dashboard-django) by creative tim
 
 <br />
 
-## ✨ Quick Start in `Docker`
+## ✨ Deploy in production using `Docker`
 
 > Get the code
 
@@ -11,48 +11,46 @@ A web application for gene search
 $ git clone <repo>
 $ cd genelookup
 ```
+> Configure environment variables
+```
+1. Create a .env file and paste the contents. 
 
+DEBUG=1
+DB_NAME=dbname
+DB_USER=rootuser
+DB_PASS=changeme
+SECRET_KEY=changeme
+ALLOWED_HOSTS=127.0.0.1
+
+2. Change the variables to store real values
+```
 > Start the app in Docker
 
 ```bash
-$ docker-compose up --build 
+$ docker-compose up --build
+$ docker-compose run --rm app sh -c "python manage.py createsuperuser"
 ```
 
-Visit `http://localhost:85` in your browser. The app should be up & running.
+Visit `http://localhost:80` in your browser. The app should be up & running.
 
 
 <br />
 
-## ✨ How to use it locally
+## ✨ How to use it for development
 
 ```bash
 $ # Get the code
 $ git clone <repo>
 $ cd genelookup
 $
-$ # Virtualenv modules installation (Unix based systems)
-$ virtualenv env
-$ source env/bin/activate
-$
-$ # Virtualenv modules installation (Windows based systems)
-$ # virtualenv env
-$ # .\env\Scripts\activate
 $ 
-$ # Install modules
-$ # Install SQL 
-$ pip3 install -r requirements.txt
+$ # Docker compose
+$ docker-compose -f docker-compose-dev.yml up --build
 $
-$ # Create tables
-$ python manage.py makemigrations
-$ python manage.py migrate
+$ # open a new terminal and run 
+$ docker-compose -f docker-compose-dev.yml run --rm app sh -c "python manage.py createsuperuser"
 $
-$ # Start the application (development mode)
-$ python manage.py runserver # default port 8000
-$
-$ # Start the app - custom port
-$ # python manage.py runserver 0.0.0.0:<your_port>
-$
-$ # Access the web app in browser: http://127.0.0.1:8000/
+$ # Access the web app in browser: http://127.0.0.1/
 ```
 
 <br />
@@ -125,13 +123,6 @@ The project is coded using a simple and intuitive structure presented below:
 
 <br />
 
-> The bootstrap flow
-
-- Django bootstrapper `manage.py` uses `core/settings.py` as the main configuration file
-- `core/settings.py` loads the app environment variables from `.env` file
-
-<br />
-
 ## ✨ Recompile CSS
 
 To recompile SCSS files, follow this setup:
@@ -175,47 +166,3 @@ The generated file is saved in `static/assets/css` directory.
 
 <br /> 
 
-## Deployment
-
-### [Gunicorn](https://gunicorn.org/)
----
-
-Gunicorn 'Green Unicorn' is a Python WSGI HTTP Server for UNIX.
-
-> Install using pip
-
-```bash
-$ pip install gunicorn
-```
-> Start the app using gunicorn binary
-
-```bash
-$ gunicorn --bind=0.0.0.0:8001 core.wsgi:application
-Serving on http://localhost:8001
-```
-
-Visit `http://localhost:8001` in your browser. The app should be up & running.
-
-
-<br />
-
-### [Waitress](https://docs.pylonsproject.org/projects/waitress/en/stable/)
----
-
-Waitress (Gunicorn equivalent for Windows) is meant to be a production-quality pure-Python WSGI server with very acceptable performance. It has no dependencies except ones that live in the Python standard library.
-
-> Install using pip
-
-```bash
-$ pip install waitress
-```
-> Start the app using [waitress-serve](https://docs.pylonsproject.org/projects/waitress/en/stable/runner.html)
-
-```bash
-$ waitress-serve --port=8001 core.wsgi:application
-Serving on http://localhost:8001
-```
-
-Visit `http://localhost:8001` in your browser. The app should be up & running.
-
-<br />
