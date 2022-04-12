@@ -9,14 +9,32 @@ LICENSE.md
 .docker
 
 # Python
-core/__pycache__/
-apps/__pycache__/
-apps/*/__pycache__/
-apps/*/*/__pycache__/
-apps/*/*/*/__pycache__/
-.env/
-.venv/
 venv/
+*.pyc
+*.pyo
+*.mo
+*.db
+*.css.map
+*.egg-info
+*.sql.gz
+.cache
+.project
+.idea
+.pydevproject
+.idea/workspace.xml
+.DS_Store
+.git/
+.sass-cache
+.vagrant/
+__pycache__
+dist
+docs
+env
+logs
+node_modules/
+web/media
+web/static/CACHE
+stats
 
 # Local PostgreSQL data
 data/
