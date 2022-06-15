@@ -4,7 +4,7 @@ from core.settings import UPLOAD_PATH
 from .forms import CsvModelForm
 import pandas as pd
 from apps.utils import required, allowed_users
-from apps.search.models import GeneStorage
+from apps.search.models import Attandance, Student, Course
 from datetime import datetime
 import traceback
 import os
@@ -18,7 +18,7 @@ def upload_file(request):
     is_csv = False
     is_excel = False
     context = {
-        'segment': 'upload',
+        'segment': 'Info-upload',
         'form': form
     }
 
@@ -34,39 +34,55 @@ def upload_file(request):
         
         try:
             if is_csv:
-                headers = pd.read_csv(file_path, nrows=0).columns.tolist()
-                req = set(headers) & set(required)
-                df1 = pd.read_csv(file_path, usecols=req, low_memory=False)
+                df1 = pd.read_csv(file_path)
             elif is_excel:
-                headers = pd.read_excel(file_path,
-                                      nrows=0).columns.tolist()
-                req = set(headers) & set(required)               
-                df1 = pd.read_excel(file_path, usecols=req, low_memory=False)
+                df1 = pd.read_excel(file_path)
 
-            df1.columns = df1.columns.str.replace(' ', '_')
-            test = df1[['chromosome', 'start_pos', 'end_pos', 'observed', 'refGene_gene', 'zygosity']]
+            
+            # test = df1[['PRN', 'Roll No', 'Name', 'Branch']]
 
             # check of the same file exists in the file system.
             os.makedirs(UPLOAD_PATH, exist_ok=True)
             file_list = [i for i in os.listdir(UPLOAD_PATH) if i.endswith('.csv')]
 
+
             if str(file_name) in file_list:
-                context['message'] = 'File already exists. Please upload a new file'
-                context['color'] = 3
+                context['icon'] = 'error'
+                context['Title'] = 'Error'
+                context['Text'] = 'File already exists. Please upload a new file'
                 return render(request, 'home/upload.html', context)
             else:
                 # After sucessfully uploading
-                context['message'] = 'File was uploaded sucessfully.'
-                context['color'] = 2
+                # TODO: Create the attandance objects
+                rows = [Student(PRN=record['PRN No'],
+                Name=record['Candidate Name'],
+                Roll=record['Roll No'],
+                Year=record['Class'],
+                Division=record['Division']
+
+                ) for record in df1.to_dict('records')]
+
+                try:
+                    Student.objects.bulk_create(rows)
+                except:
+                    Student.objects.bulk_update(rows, fields=['Roll', 'Name', 'Year', 'Division'])
+
+                context['icon'] = 'success'
+                context['Title'] = 'Success'
+                context['Text'] = 'Your file has been uploaded sucessfully'
                 form.cleaned_data['activated'] = True
                 form.save()
 
         except Exception:
             traceback.print_exc()
-            context['message'] = 'An Error occured while uploading the file, please make sure the file format is correct and it contains all required columns.'
-            context['color'] = 4
+            context['icon'] = 'error'
+            context['Title'] = 'Error'
+            context['Text'] = "Invalid file data. An error occured, please upload again"
 
-    return render(request, 'home/upload.html', context)
+    return render(request, 'labs/upload.html', context)
+
+
+
 
 
 @login_required(login_url='/login')

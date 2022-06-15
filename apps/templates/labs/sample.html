@@ -1,0 +1,181 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Sample{% endblock %}
+
+{% block content %}
+<div class="text-center d-flex align-items-center justify-content-center">
+<h3> Sample </h3>
+</div>
+<br>
+<form action="" method="post">
+{% csrf_token %}
+<div class="row">
+
+<div class="col-md-6 pt-1">
+<label for="year">Year: </label>
+<select name="year" id="year" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    {% for year in years %}
+    <option value="{{year}}">{{year}}</option>
+    {% endfor %}
+</select>
+</div>
+
+<div class="col-md-6 pt-1">
+<label for="month">Month: </label>
+<select name="month" id="month" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    {% for month in Months %}
+    <option value="{{month}}">{{month}}</option>
+    {% endfor %}
+</select>
+</div>
+</div>
+
+
+<br>
+<div class="chartMenu">
+    <div class="chartCard row">
+      <div class="chartBox-wide col-md-6">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+</div>
+<br>
+<br>
+
+<div class="row">
+
+<div class="col-md-6 pt-1">
+<label for="assay2">Machines: </label>
+<select name="assay2" id="assay2" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    {% for as in Machines %}
+    <option value="{{as}}">{{as}}</option>
+    {% endfor %}
+</select>
+</div>
+
+<div class="col-md-6 pt-1">
+<label for="year2">Year: </label>
+<select name="year2" id="year2" onchange="this.form.submit();" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    {% for year in years %}
+    <option value="{{year}}">{{year}}</option>
+    {% endfor %}
+</select>
+</div>
+</div>
+</form>
+
+<br>
+<div class="chartMenu">
+    <div class="chartCard row">
+      <div class="chartBox-wide col-md-6">
+        <canvas id="myChart2"></canvas>
+      </div>
+    </div>
+</div>
+<br>
+<br>
+
+<script>
+$(document).ready(function () {
+   $(function () {
+
+       let year = {{sel_year}};
+       let month = '{{sel_month}}';
+       let year2 = ('{{sel_year2}}' == 'All') ? 'All' : parseInt('{{sel_year2}}');
+       let machine = '{{sel_machine}}';
+
+       $('#year').val(year);
+       $('#month').val(month);
+       $('#year2').val(year2);
+       $('#assay2').val(machine);
+   });
+});
+    // setup 
+ const data = {
+      labels: [{% for i in machine_labels %} '{{i}}', {% endfor %}],
+      datasets: [{
+        label: 'Actual samples',
+        data: [{% for i in collected_samples %} {{i}}, {% endfor %}],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.2)',
+        ],
+        borderColor: [
+          'rgba(75, 192, 192, 1)',
+        ],
+        borderWidth: 1
+      },
+      {
+        label: 'Potential samples',
+        data: [{% for i in missed_samples %} {{i}}, {% endfor %}],
+        backgroundColor: [
+          'rgba(255, 26, 104, 0.2)',
+        ],
+        borderColor: [
+          'rgba(255, 26, 106, 1)',
+        ],
+        borderWidth: 1
+      }
+    ]
+    };
+
+    // config 
+    const config = {
+      type: 'bar',
+      data: data,
+      options: {
+        scales: {
+          y: {
+            stacked: true,
+            beginAtZero: true
+          },
+          x : {
+            stacked: true
+          }
+        }
+      }
+    };
+
+    // render init block
+    const myChart = new Chart(
+      document.getElementById('myChart'),
+      config
+    );
+ 
+</script>
+<script>
+let year = ('{{sel_year2}}' == 'All') ? 'all years' : parseInt('{{sel_year2}}');
+const sampledata = {
+      labels: [{% for i in graph2_labels %} '{{i}}', {% endfor %}],
+      datasets: [{
+        label: `samples collected by {{sel_machine}} in ${year}`,
+        data: [{% for i in graph2_data %} {{i}}, {% endfor %}],
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.2)',
+        ],
+        borderColor: [
+          'rgba(54, 162, 235, 1)',
+        ],
+        borderWidth: 1
+      }]
+    };
+
+    // config 
+    const sampleconfig = {
+      type: 'bar',
+      data: sampledata,
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    };
+
+    // render init block
+    const sampleChart = new Chart(
+      document.getElementById('myChart2'),
+      sampleconfig
+    );
+</script>
+{% endblock %}
