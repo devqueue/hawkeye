@@ -1,35 +1,50 @@
 from django.db import models
+import string
 
 # Create your models here.
 
+divisions = list(string.ascii_uppercase)
 
-class GeneStorage(models.Model):
-    id = models.AutoField(primary_key=True)
-    chromosome = models.CharField(max_length=10)
-    start_pos = models.IntegerField()
-    end_pos = models.IntegerField()
-    observed = models.TextField()
-    reference = models.TextField(default=None, null=True, blank=True)
-    zygosity = models.TextField(default=None)
-    refGene_function = models.TextField(default=None, null=True, blank=True)
-    refGene_gene = models.TextField()
-    quality = models.TextField(default=None, null=True, blank=True)
-    refGene_exonic_function = models.TextField(default=None, null=True, blank=True)
-    AC = models.TextField(default=None, null=True, blank=True)
-    AC_hom = models.TextField(default=None, null=True, blank=True)
-    aug_all = models.TextField(default=None, null=True, blank=True)
-    ExAC_ALL = models.TextField(default=None, null=True, blank=True)
-    gnomAD_exome_AF = models.TextField(default=None, null=True, blank=True)
-    Kaviar_AF = models.TextField(default=None, null=True, blank=True)
-    SIFT_pred_41a = models.TextField(default=None, null=True, blank=True)
-    SIFT4G_pred_41a = models.TextField(default=None, null=True, blank=True)
-    Polyphen2_HDIV_pred_41a = models.TextField(default=None, null=True, blank=True)
-    Polyphen2_HVAR_pred_41a = models.TextField(default=None, null=True, blank=True)
-    CADD_phred_41a = models.TextField(default=None, null=True, blank=True)
-    CLNSIG = models.TextField(default=None, null=True, blank=True)
-    filename = models.TextField(default=None, null=True, blank=True)
-    count_hom = models.IntegerField(default=None, null=True, blank=True)
-    count_het = models.IntegerField(default=None, null=True, blank=True)
-    count_total = models.IntegerField(default=None, null=True, blank=True)
-    files_uploaded = models.IntegerField(default=None, null=True, blank=True)
-    New_allele_frequency = models.FloatField(default=None, null=True, blank=True)
+
+
+class branch_choices(models.TextChoices):
+    AI = 'AI & DS'
+    MECH = 'Mechanical'
+    CIVIL = 'Civil'
+    IT = 'IT'
+    CS = 'CS'
+    ENTC = 'ENTC'
+
+class division_choices(models.TextChoices):
+    A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z = list(string.ascii_uppercase)
+
+
+class Student(models.Model):
+    PRN = models.IntegerField(primary_key=True)
+    Roll = models.IntegerField()
+    Name = models.CharField(max_length=100)
+    Year = models.CharField(max_length=20)
+    Division = models.CharField(max_length=1, choices=division_choices.choices)
+    Batch = models.CharField(max_length=2)
+    Branch = models.CharField(max_length=50, choices=branch_choices.choices)
+
+    def __str__(self) -> str:
+        return "%s %s" % (self.Roll, self.Name)
+
+class Course(models.Model):
+    Code = models.CharField(max_length=10, primary_key=True)
+    Name = models.CharField(max_length=100)
+    Credit = models.IntegerField()
+    Description = models.TextField()
+
+    def __str__(self) -> str:
+        return "%s" % (self.Name)
+
+class Attandance(models.Model):
+    sr_no = models.AutoField(primary_key=True)
+    Student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    Day = models.DateField()
+    TimeSlot = models.TimeField()
+    present = models.BooleanField()
+    

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import GeneStorage
+from .models import Attandance, Student, Course
 import pandas as pd
 from django.http import HttpResponse
 from apps.utils import allowed_users
@@ -11,98 +11,63 @@ from apps.utils import allowed_users
 @allowed_users(allowed_roles=['compute', 'search'])
 def search_gene(request):
     context = {
-        'segment': 'search',
-        'types': ['Chromosome', 'Gene'],
+        'segment': 'Info-search',
+        
     }
+    course_set = Course.objects.all().values()
+    courses = [i['Code'] for i in course_set]
+
+    student_set = Student.objects.all().values()
+    print(student_set)
+    years = set([i['Year'] for i in student_set])
+    Division = set([i['Division'] for i in student_set])
+
+    context['courses'] = courses
+    context['years'] = years
+    context['divisions'] = Division
+
+
     if request.method == 'POST':
         try:
-            search = request.POST.get("search")
-            select_type = request.POST.get("type")
-            start = request.POST.get('start', default=None)
-            end = request.POST.get('end', default=None)
+            course = request.POST.get("course")
+            year = request.POST.get("Year")
+            division = request.POST.get('division')
+            
             export = request.POST.get('export')
-            columns_required = request.POST.getlist('columns')
-            context['sel_type'] = select_type
-            context['search'] = search
-            context['columns_req'] = columns_required
-            context['start'] = start
-            context['end'] = end
 
-            if select_type == 'Gene':
-                if (search.startswith('"') and search.endswith('"')):
-                    search = search.replace('"', '')
-                    result = GeneStorage.objects.filter(refGene_gene=search).values()
-                else:
-                    result = GeneStorage.objects.filter(refGene_gene__contains=search).values()
-            else:
-                result = GeneStorage.objects.filter(chromosome=search, start_pos=start, end_pos=end).values()
+            context['sel_course'] = course
+            context['sel_year'] = year
+            context['sel_division'] = division
+
+            result = Attandance.objects.filter(course=course).values()
+            student = Student.objects.all().values()
 
             df = pd.DataFrame(list(result))
-            df = df.rename({'aug_all': '1000genome'}, axis=1)
+            df_stud = pd.DataFrame(list(student))
 
-            df.dropna(how='all', axis=1, inplace=True)
-            context['df_header_all'] = list(df.columns)
+            df_joined = df.merge(df_stud, left_on='Student_id', right_on='PRN')
 
-            if columns_required != []:
-                df.drop(df.columns.difference(columns_required), axis=1, inplace=True)
-            else:
-                df.drop(df.columns.difference(['chromosome', 'start_pos', 'end_pos', 'observed', 'refGene gene',
-                        'zygosity', 'filename', 'count_hom', 'count_het', 'count_total', 'New_allele_frequency']), axis=1, inplace=True)
-                
-            context['df'] = df.to_dict('records')
-            context['df_header'] = list(df.columns)
+            if division:
+                df_joined = df_joined[(df_joined['Division'] == division)]
+            if year:
+                df_joined = df_joined[ (df_joined['Year'] == year)]
+
+            context['df'] = df_joined.to_dict('records')
+            context['df_header'] = list(df_joined.columns)
 
             if export:
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = f'attachment; filename=exported.csv'
-                export = pd.DataFrame(list(result))
-                export = export.rename({'aug_all': '1000genome'}, axis=1)
-                export.dropna(how='all', axis=1, inplace=True)
-                export.to_csv(path_or_buf=response)
+                
+                df_joined.to_csv(path_or_buf=response, index=False)
                 return response
 
-            return render(request, 'home/search.html', context)
+            return render(request, 'labs/index.html', context)
+
         except Exception as e:
             print('[ERROR]:', e)
-            context['sel_type'] = 'Chromosome'
-            return render(request, 'home/search.html', context)
+
+            return render(request, 'labs/index.html', context)
     else:
-        context['sel_type'] = 'Chromosome'
-        return render(request, 'home/search.html', context)
-
-
-@login_required(login_url='login/')
-@allowed_users(allowed_roles=['compute', 'search'])
-def export(request):
-    context = {
-        'segment': 'export',
-    }
-    if request.method == 'POST':
-        filename = request.POST.get('search')
-        export = request.POST.get('export')
-        context['filename'] = filename
-
-        if (filename.startswith('"') and filename.endswith('"')):
-            filename = filename.replace('"', '')
-            result = GeneStorage.objects.filter(filename=filename).values()
-        else:
-            result = GeneStorage.objects.filter(filename__contains=filename).values()
-            
-        df = pd.DataFrame(list(result))
-        df = df.head(50)
-        context['df_header'] = list(df.columns)
-        context['df'] = df.to_dict('records')
-        
-        if df.empty:
-            context['notfound'] = True
-            print("[INFO]: FILE NOT FOUND")
-            return render(request, 'home/export.html', context)
-        if export:
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = f'attachment; filename={filename}.csv'
-            print("[INFO]: FILE FOUND")
-            df.to_csv(path_or_buf=response)
-            return response
-
-    return render(request, 'home/export.html', context)
+        return render(request, 'labs/index.html', context)
 
