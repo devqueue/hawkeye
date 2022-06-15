@@ -9,5 +9,5 @@ whitenoise==5.3.0
 pandas==1.4.1
 numpy==1.22.2
 openpyxl==3.0.9
-psycopg2>=2.8.6,<2.9
-uWSGI>=2.0.19.1,<2.1
+psycopg2-binary>=2.8
+uWSGI>=2.0
