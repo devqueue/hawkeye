@@ -1,14 +1,17 @@
+from wsgiref.util import request_uri
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Attandance, Student, Course
+from .serializers import AttandanceSerializer
 import pandas as pd
-from django.http import HttpResponse
-from apps.utils import allowed_users
+from django.http import HttpResponse, JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
 
 @login_required(login_url='accounts/login_user')
-# @allowed_users(allowed_roles=['compute', 'search'])
 def search_gene(request):
     context = {
         'segment': 'Info-search',
@@ -71,3 +74,22 @@ def search_gene(request):
     else:
         return render(request, 'labs/index.html', context)
 
+
+@api_view(['GET', 'POST'])
+def postdata_api(request):
+
+    if request.method == 'GET':
+        attandances = Attandance.objects.all()
+        serializer = AttandanceSerializer(attandances, many=True)
+
+        return JsonResponse({"Data": serializer.data})
+
+    if request.method == 'POST':
+        serializer = AttandanceSerializer(data=request.data)
+        print(serializer.initial_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response("BAD REQUEST", status=status.HTTP_400_BAD_REQUEST)
+        
