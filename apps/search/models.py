@@ -29,7 +29,7 @@ class Student(models.Model):
     Branch = models.CharField(max_length=50, choices=branch_choices.choices)
 
     def __str__(self) -> str:
-        return "%s %s" % (self.Roll, self.Name)
+        return "%s" % (self.Roll)
 
 class Course(models.Model):
     Code = models.CharField(max_length=10, primary_key=True)
@@ -47,4 +47,7 @@ class Attandance(models.Model):
     Day = models.DateField()
     TimeSlot = models.TimeField()
     present = models.BooleanField()
+
+    def __str__(self) -> str:
+        return "%s" % (self.Student)
     

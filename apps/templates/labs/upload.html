@@ -82,6 +82,15 @@
                 </div>
                 <form action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %} 
+                    <div>
+                        <label for="Type">Type: </label>
+                        <select name="Type" id="Type" class="form-select form-select-sm" style="width:30%;">
+                            <option value="Attendance">Attendance</option>
+                            <option value="Student">Student</option>
+                            <option value="Course">Course</option>
+                        </select>
+                    </div>
+                    <br>
                     <div class='d-flex justify-content-center'>
                         <div class="drop-zone">
                             <div class="drop-zone__prompt">

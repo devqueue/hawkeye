@@ -8,7 +8,7 @@ from apps.utils import allowed_users
 
 
 @login_required(login_url='accounts/login_user')
-@allowed_users(allowed_roles=['compute', 'search'])
+# @allowed_users(allowed_roles=['compute', 'search'])
 def search_gene(request):
     context = {
         'segment': 'Info-search',
@@ -18,9 +18,9 @@ def search_gene(request):
     courses = [i['Code'] for i in course_set]
 
     student_set = Student.objects.all().values()
-    print(student_set)
     years = set([i['Year'] for i in student_set])
-    Division = set([i['Division'] for i in student_set])
+    Division = list(set([i['Division'] for i in student_set]))
+    Division = list(sorted(Division))
 
     context['courses'] = courses
     context['years'] = years
