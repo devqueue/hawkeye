@@ -39,8 +39,6 @@ def register_user(request):
     msg = None
     success = False
     # create groups
-    compute, created = Group.objects.get_or_create(name='compute')
-    search, created = Group.objects.get_or_create(name='search')
 
 
     if request.method == "POST":
@@ -50,8 +48,6 @@ def register_user(request):
             username = form.cleaned_data.get("username")
             raw_password = form.cleaned_data.get("password1")
 
-            group =  Group.objects.get(name='search')
-            user.groups.add(group)
             user = authenticate(username=username, password=raw_password)
 
             msg = 'User account was created sucessfully'
