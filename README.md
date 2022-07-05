@@ -1,5 +1,5 @@
 # HawkEye
-A web application for gene search built with django using the [django black template](https://github.com/creativetimofficial/black-dashboard-django) by creative tim
+A web based Attandance system built with django using the [django black template](https://github.com/creativetimofficial/black-dashboard-django) by creative tim
 
 <br />
 
