@@ -1,12 +1,8 @@
-# Gene lookup
+# HawkEye
 A web application for gene search built with django using the [django black template](https://github.com/creativetimofficial/black-dashboard-django) by creative tim
 
 <br />
 
-## Data requirements
-1. The uploaded CSV files must contain the following columns Chromosome, start, end, referance, observed, refGene gene, zygosity, filename. The application will not process the file unless these columns are found.
-2. Rest of the columns are optional and can be included if required. You need to update the `required` list in `apps/utils.py`. these names must match the ones in the CSV
-3. Also note that the app will only read these columns from the csv regardless of how many columns are available 
 ## ✨ Deploy in production using `Docker`
 
 > Get the code
